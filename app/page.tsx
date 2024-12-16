@@ -7,9 +7,16 @@ import { UploadButton } from "@/app/utils/uploadthing";
 import { CompanyRegistrationFormData } from "./constants/types";
 import { useRouter } from "next/navigation";
 
+interface UploadResult {
+  url: string;
+  name: string;
+  size: number;
+  // Add other properties as needed
+}
+
 const CompanyRegistrationForm = () => {
-  const router = useRouter(); 
-  
+  const router = useRouter();
+
   const { register, control, handleSubmit, watch, setValue } = useForm({
     defaultValues: {
       personalInfo: {
@@ -93,8 +100,6 @@ const CompanyRegistrationForm = () => {
   const banks = ["Absa", "FNB", "Capitec", "Nedbank", "Standard Bank"];
 
   const onSubmit = async (data: CompanyRegistrationFormData) => {
-    
-
     try {
       const response = await fetch("/api/emails", {
         method: "POST",
@@ -107,7 +112,7 @@ const CompanyRegistrationForm = () => {
       if (response.ok) {
         toast.success("Form submitted and email sent successfully!");
         // Redirect to thank you page
-        router.push('/thank-you');
+        router.push("/thank-you");
       } else {
         toast.error("Failed to submit form or send email");
       }
@@ -123,19 +128,18 @@ const CompanyRegistrationForm = () => {
   return (
     <div className="container mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
       <Toaster position="top-right" />
-      
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      <h1 className="text-2xl font-bold mb-6 text-center text-black">
-        Company Registration Form
-      </h1>
-      {/* Personal Information Section */}
+        <h1 className="text-2xl font-bold mb-6 text-center text-black">
+          Company Registration Form
+        </h1>
+        {/* Personal Information Section */}
         <section className="bg-gray-50 p-4 rounded-lg">
           <h2 className="text-xl font-semibold mb-4 text-black">
             1. Personal Information
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-             <input
+            <input
               {...register("personalInfo.fullName", { required: true })}
               placeholder="Full Name *"
               className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -174,7 +178,7 @@ const CompanyRegistrationForm = () => {
                 {/* For ID Document */}
                 <UploadButton
                   endpoint="idDocumentUploader"
-                  onClientUploadComplete={(res) => {
+                  onClientUploadComplete={(res: UploadResult[]) => {
                     // Safely access the first uploaded file's URL
                     if (res && res.length > 0) {
                       setValue("personalInfo.idDocument", {
@@ -249,7 +253,7 @@ const CompanyRegistrationForm = () => {
                 {/* For Proof of Residence */}
                 <UploadButton
                   endpoint="proofOfResidenceUploader"
-                  onClientUploadComplete={(res) => {
+                  onClientUploadComplete={(res: UploadResult[]) => {
                     if (res && res.length > 0) {
                       setValue("businessAddress.proofOfAddress", {
                         url: res[0].url,
