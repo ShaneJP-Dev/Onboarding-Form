@@ -5,8 +5,10 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { toast, Toaster } from "react-hot-toast";
 import { UploadButton } from "@/app/utils/uploadthing";
 import { CompanyRegistrationFormData } from "./constants/types";
+import { useRouter } from "next/navigation";
 
 const CompanyRegistrationForm = () => {
+  const router = useRouter(); 
   
   const { register, control, handleSubmit, watch, setValue } = useForm({
     defaultValues: {
@@ -91,6 +93,8 @@ const CompanyRegistrationForm = () => {
   const banks = ["Absa", "FNB", "Capitec", "Nedbank", "Standard Bank"];
 
   const onSubmit = async (data: CompanyRegistrationFormData) => {
+    
+
     try {
       const response = await fetch("/api/emails", {
         method: "POST",
@@ -102,6 +106,8 @@ const CompanyRegistrationForm = () => {
 
       if (response.ok) {
         toast.success("Form submitted and email sent successfully!");
+        // Redirect to thank you page
+        router.push('/thank-you');
       } else {
         toast.error("Failed to submit form or send email");
       }
